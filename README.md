@@ -59,4 +59,4 @@ Data load procedures:
 
 8: Establish indexes on "`packaging`" collection
 
-  * `db.packagin.createIndex( { productID: 1, productNDC: 1, ndcPackageCode: 1 } )`
+  * `db.packaging.createIndex( { productID: 1, productNDC: 1, ndcPackageCode: 1 } )`
