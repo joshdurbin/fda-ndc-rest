@@ -9,7 +9,7 @@
     "rxmongo"
   ],
   "addons": [
-    "mongolab:sandbox",
+    "mongolab:sandbox"
   ],
   "env": {
     "BUILDPACK_URL": "https://github.com/heroku/heroku-buildpack-gradle",
