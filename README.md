@@ -57,6 +57,8 @@ Data load procedures:
 
   * `db.products.createIndex( { productID: 1, productNDC: 1, labelerName: 1, productTypeName: 1 } )`
 
-8: Establish indexes on "`packaging`" collection
+8. Establish indexes on "`packaging`" collection
 
   * `db.packaging.createIndex( { productID: 1, productNDC: 1, ndcPackageCode: 1 } )`
+
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/joshdurbin/fda-ndc-rest)  
