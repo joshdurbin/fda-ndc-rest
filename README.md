@@ -5,60 +5,47 @@ Data load procedures:
 
 1. Goto: http://www.fda.gov/Drugs/InformationOnDrugs/ucm142438.htm
 2. Download the file "NDC Database File (Zip Format)"
-3. Unpack "NDC Database File (Zip Format)" and note the two txt and two Excel files. The text files are tab delimited files.
-4. Execute imports into mongo
+3. Unpack "NDC Database File (Zip Format)" and note the two txt and two Excel files. The text files are tab delimited files (TSV).
+4. With the latest Java 8 JDK and [Groovy](http://www.groovy-lang.org/) installed (recommend via [sdkman](http://sdkman.io/)), execute the [TSV conversion script](https://raw.githubusercontent.com/joshdurbin/fda-ndc-rest/data_cleaning_scripts/FormatNDCData.groovy) found in the [data-cleaning-scripts](https://github.com/joshdurbin/fda-ndc-rest/tree/data_cleaning_scripts) branch.
+4. Place the script in the same directory as the `package.txt` and `product.txt` files and execute. It will produce a JSON file, `fdaProductsForImport.json`.
+5. Import script output into Mongo
 
-  * `mongoimport -v --host=127.0.0.1 --port=27017 --db fda_national_drug_codes --collection products --type=tsv --headerline product.txt`
-  * `mongoimport -v --host=127.0.0.1 --port=27017 --db fda_national_drug_codes --collection packaging --type=tsv --headerline package.txt`
+  * `mongoimport -v --host=127.0.0.1 --port=27017 --db fda-ndc-rest --collection products fdaProductsForImport.json`
 
-5. Execute updates to property names for "`products`" collection
+7. Establish indexes on "`products`" collection
 
   ```javascript
-    db.products.update(
-    {},{
-    $rename: { 'PRODUCTID': 'productID',
-      'PRODUCTNDC': 'productNDC',
-      'PRODUCTTYPENAME': 'productTypeName',
-      'PROPRIETARYNAME': 'proprietaryName',
-      'PROPRIETARYNAMESUFFIX': 'proprietaryNameSuffix',
-      'NONPROPRIETARYNAME': 'nonProprietaryName',
-      'DOSAGEFORMNAME': 'dosageFormName',
-      'ROUTENAME': 'routeName',
-      'STARTMARKETINGDATE': 'startMarketingDate',
-      'ENDMARKETINGDATE': 'endMarketingDate',
-      'MARKETINGCATEGORYNAME': 'marketingCategoryName',
-      'APPLICATIONNUMBER': 'applicationNumber',
-      'LABELERNAME': 'labelerName',
-      'SUBSTANCENAME': 'substanceName',      
-      'ACTIVE_NUMERATOR_STRENGTH': 'activeNumeratorStrength',
-      'ACTIVE_INGRED_UNIT': 'activeIngredUnit',
-      'PHARM_CLASSES': 'pharmClasses',
-      'DEASCHEDULE': 'deaSchedule' }
+  db.outputtwo.createIndex(
+    {
+      productID: 1,
+      productNDC: 1,
+      labelerName: 1,
+      productTypeName: 1
     },
-    false,
-    true )
+    {
+      name: "NonTextIndex"
+    }
+)
 ```
 
-6. Execute updates to property names for "`packaging`" collection
+8. Establish text indexes on "`products`" collection
 
   ```javascript
-    db.packing.update( 
-    {},{ 
-    $rename: { 'PRODUCTID': 'productID', 
-      'PRODUCTNDC': 'productNDC', 
-      'NDCPACKAGECODE': 'ndcPackageCode', 
-      'PACKAGEDESCRIPTION': 'packageDescription'} 
-    }, 
-    false, 
-    true )
-```    
-
-7. Establish indexes on "`drugs`" collection
-
-  * `db.products.createIndex( { productID: 1, productNDC: 1, labelerName: 1, productTypeName: 1 } )`
-
-8. Establish indexes on "`packaging`" collection
-
-  * `db.packaging.createIndex( { productID: 1, productNDC: 1, ndcPackageCode: 1 } )`
+  db.outputtwo.createIndex(
+    {
+      pharmacologicalClassCategories: "text",
+      "substances.name": "text",
+      nonProprietaryName: "text",
+      proprietaryName: "text"
+    },
+    {
+      weights: {
+        proprietaryName: 10,
+        nonProprietaryName: 5
+      },
+      name: "TextIndex"
+    }
+)
+```
 
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/joshdurbin/fda-ndc-rest)  
