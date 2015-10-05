@@ -12,10 +12,10 @@ Data load procedures:
 
   * `mongoimport -v --host=127.0.0.1 --port=27017 --db fda-ndc-rest --collection products fdaProductsForImport.json`
 
-7. Establish indexes on "`products`" collection
+7. Establish indexes on collection
 
   ```javascript
-  db.outputtwo.createIndex(
+  db.products.createIndex(
     {
       productID: 1,
       productNDC: 1,
@@ -28,10 +28,10 @@ Data load procedures:
 )
 ```
 
-8. Establish text indexes on "`products`" collection
+8. Establish text indexes on collection
 
   ```javascript
-  db.outputtwo.createIndex(
+  db.products.createIndex(
     {
       pharmacologicalClassCategories: "text",
       "substances.name": "text",
