@@ -1,0 +1,7 @@
+config:
+  lookupServiceDB: fda-ndc-rest
+  lookupServiceURI: mongodb://localhost/cms-npi-rest
+  lookupServiceCollection: products
+  defaultResultsPageSize: 20
+  maxResultsPageSize: 50
+  defaultFirstPage: 1
