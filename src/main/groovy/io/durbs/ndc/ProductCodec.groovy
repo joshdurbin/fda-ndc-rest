@@ -1,6 +1,7 @@
 package io.durbs.ndc
 
 import io.durbs.ndc.domain.Packaging
+import io.durbs.ndc.domain.PharmacologicalClassCategory
 import io.durbs.ndc.domain.Product
 import io.durbs.ndc.domain.Substance
 import org.bson.BsonReader
@@ -43,7 +44,10 @@ class ProductCodec implements Codec<Product> {
           activeNumeratorStrength: substanceDocument.getDouble('activeNumeratorStrength'),
           activeIngredUnit: substanceDocument.getString('activeIngredUnit'))
       },
-      pharmacologicalClassCategories: document.get('pharmacologicalClassCategories', List),
+      pharmacologicalClassCategories: document.get('pharmacologicalClassCategories', List).collect { Document pharmacologicalClassCategoryDocument ->
+        new PharmacologicalClassCategory(name: pharmacologicalClassCategoryDocument.getString('name'),
+          code: pharmacologicalClassCategoryDocument.getString('code'),)
+      },
       deaScheduleNumber: document.getString('deaScheduleNumber'),
       packaging: document.get('packaging', List).collect { Document packagingDocument ->
         new Packaging(ndcPackageCode: packagingDocument.getString('ndcPackageCode'),

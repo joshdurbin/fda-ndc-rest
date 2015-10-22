@@ -1,10 +1,12 @@
 package io.durbs.ndc
 
 import com.google.inject.Inject
+import com.google.inject.Singleton
 import io.durbs.ndc.domain.Product
 import ratpack.groovy.handling.GroovyChainAction
 import ratpack.jackson.Jackson
 
+@Singleton
 class ProductActionChain extends GroovyChainAction {
 
   @Inject

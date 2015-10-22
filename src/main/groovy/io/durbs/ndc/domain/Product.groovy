@@ -16,14 +16,14 @@ class Product {
   String proprietaryNameSuffix
   List<String> nonProprietaryName
   String dosageFormName
-  String routeName
+  List<String> routeName
   LocalDate startMarketingDate
   LocalDate endMarketingDate
   String marketingCategoryName
   String applicationNumber
   String labelerName
   List<Substance> substances
-  List<String> pharmacologicalClassCategories
+  List<PharmacologicalClassCategory> pharmacologicalClassCategories
   String deaScheduleNumber
   List<Packaging> packaging
 }

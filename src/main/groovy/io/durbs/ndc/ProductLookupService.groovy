@@ -1,6 +1,7 @@
 package io.durbs.ndc
 
 import com.google.inject.Inject
+import com.google.inject.Singleton
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClient
 import com.mongodb.async.client.MongoClientSettings
@@ -22,16 +23,18 @@ import static com.mongodb.client.model.Filters.eq
 import static com.mongodb.client.model.Filters.text
 
 @CompileStatic
+@Singleton
 class ProductLookupService {
 
-  @Inject
-  NDCRestConfig config
-
+  private NDCRestConfig config
   private MongoDatabase mongoDatabase
 
-  ProductLookupService() {
+  @Inject
+  ProductLookupService(NDCRestConfig config) {
 
-    final ConnectionString connectionString = new ConnectionString('mongodb://heroku_33rvtbr0:go1epcr944593v04cqrik8t01u@ds029824.mongolab.com:29824/heroku_33rvtbr0')
+    this.config = config
+
+    final ConnectionString connectionString = new ConnectionString(config.lookupServiceURI)
     final CodecRegistry codecRegistry = CodecRegistries.fromRegistries(
       MongoClient.getDefaultCodecRegistry(),
       CodecRegistries.fromCodecs(new ProductCodec()))
@@ -46,13 +49,13 @@ class ProductLookupService {
       .build()
 
     RXMongoClient rxMongoClient = MongoClients.create(mongoClientSettings)
-    mongoDatabase = rxMongoClient.getDatabase('heroku_33rvtbr0')
+    mongoDatabase = rxMongoClient.getDatabase(config.lookupServiceDB)
   }
 
   Observable<Product> getAll() {
 
     mongoDatabase
-      .getCollection('products', Product)
+      .getCollection(config.lookupServiceCollection, Product)
       .find()
       .limit(10)
       .toObservable()
@@ -62,9 +65,8 @@ class ProductLookupService {
   Observable<Product> search(final String searchTerm) {
 
     mongoDatabase
-      .getCollection('products', Product)
+      .getCollection(config.lookupServiceCollection, Product)
       .find(text(searchTerm))
-      .limit(10)
       .toObservable()
       .bindExec()
   }
@@ -72,7 +74,7 @@ class ProductLookupService {
   Observable<Product> getByNDCCode(final String ndcCode) {
 
     mongoDatabase
-      .getCollection('products', Product)
+      .getCollection(config.lookupServiceCollection, Product)
       .find(eq('productNDC', ndcCode))
       .limit(10)
       .toObservable()
