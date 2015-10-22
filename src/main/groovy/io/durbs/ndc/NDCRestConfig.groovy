@@ -11,7 +11,7 @@ class NDCRestConfig {
   Integer maxResultsPageSize
   Integer defaultFirstPage
 
-  String lookupServiceDB
-  String lookupServiceURI
-  String lookupServiceCollection
+  String db
+  String uri
+  String collection
 }

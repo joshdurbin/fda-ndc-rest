@@ -23,8 +23,6 @@ ratpack {
 
     bindInstance(NDCRestConfig, configData.get('/config', NDCRestConfig))
 
-
-
     bindInstance(ObjectMapper, new ObjectMapper()
       .registerModule(new JavaTimeModule())
       .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)

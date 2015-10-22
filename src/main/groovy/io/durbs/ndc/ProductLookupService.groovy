@@ -34,7 +34,7 @@ class ProductLookupService {
 
     this.config = config
 
-    final ConnectionString connectionString = new ConnectionString(config.lookupServiceURI)
+    final ConnectionString connectionString = new ConnectionString(config.uri)
     final CodecRegistry codecRegistry = CodecRegistries.fromRegistries(
       MongoClient.getDefaultCodecRegistry(),
       CodecRegistries.fromCodecs(new ProductCodec()))
@@ -49,13 +49,13 @@ class ProductLookupService {
       .build()
 
     RXMongoClient rxMongoClient = MongoClients.create(mongoClientSettings)
-    mongoDatabase = rxMongoClient.getDatabase(config.lookupServiceDB)
+    mongoDatabase = rxMongoClient.getDatabase(config.db)
   }
 
   Observable<Product> getAll() {
 
     mongoDatabase
-      .getCollection(config.lookupServiceCollection, Product)
+      .getCollection(config.collection, Product)
       .find()
       .limit(10)
       .toObservable()
@@ -65,7 +65,7 @@ class ProductLookupService {
   Observable<Product> search(final String searchTerm) {
 
     mongoDatabase
-      .getCollection(config.lookupServiceCollection, Product)
+      .getCollection(config.collection, Product)
       .find(text(searchTerm))
       .toObservable()
       .bindExec()
@@ -74,7 +74,7 @@ class ProductLookupService {
   Observable<Product> getByNDCCode(final String ndcCode) {
 
     mongoDatabase
-      .getCollection(config.lookupServiceCollection, Product)
+      .getCollection(config.collection, Product)
       .find(eq('productNDC', ndcCode))
       .limit(10)
       .toObservable()

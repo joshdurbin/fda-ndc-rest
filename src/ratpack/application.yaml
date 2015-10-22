@@ -1,7 +1,7 @@
 config:
-  lookupServiceDB: fda-ndc-rest
-  lookupServiceURI: mongodb://localhost/fda-ndc-rest
-  lookupServiceCollection: products
+  db: fda-ndc-rest
+  uri: mongodb://localhost/fda-ndc-rest
+  collection: products
   defaultResultsPageSize: 20
   maxResultsPageSize: 50
   defaultFirstPage: 1
