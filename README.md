@@ -16,15 +16,19 @@ Data load procedures:
 
   ```javascript
   db.products.createIndex(
-    {
-      productID: 1,
-      productNDC: 1,
-      labelerName: 1,
-      productTypeName: 1
-    },
-    {
-      name: "NonTextIndex"
-    }
+  {
+    applicationNumber: 1,
+    labelerName: 1,
+    marketingCategoryName: 1,
+    productID: 1,
+    productNDC: 1,  
+    productTypeName: 1,
+    "pharmacologicalClassCategories.code": 1,
+    startMarketingDate: 1    
+  },
+  {
+    name: "Non Text Indexes"
+  }
 )
 ```
 
@@ -32,19 +36,19 @@ Data load procedures:
 
   ```javascript
   db.products.createIndex(
-    {
-      pharmacologicalClassCategories: "text",
-      "substances.name": "text",
-      nonProprietaryName: "text",
-      proprietaryName: "text"
+  {
+    "$**": "text"
+  },
+  {
+    weights: {
+      proprietaryName: 5,
+      labelerName: 4,
+      nonProprietaryName: 3,
+      "substances.name": 2,
+      "pharmacologicalClassCategories.name": 2,
     },
-    {
-      weights: {
-        proprietaryName: 10,
-        nonProprietaryName: 5
-      },
-      name: "TextIndex"
-    }
+    name: "Text Index w/ Weights"
+  }
 )
 ```
 
