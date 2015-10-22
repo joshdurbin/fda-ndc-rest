@@ -43,6 +43,10 @@ ratpack {
 
   handlers {
 
+    get('loaderio-69848b6992185269cd57a7fc9d760715.txt') {
+      render('loaderio-69848b6992185269cd57a7fc9d760715')
+    }
+
     prefix('api/v0/product') {
       all chain(registry.get(ProductActionChain))
     }
