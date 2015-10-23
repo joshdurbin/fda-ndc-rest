@@ -27,6 +27,26 @@ class ProductActionChain extends GroovyChainAction {
       }
     }
 
+    get('productTypeNames') {
+
+      productLookupService.productTypeNames
+        .toList()
+        .subscribe { List<String> names ->
+
+        render Jackson.json(names)
+      }
+    }
+
+    get('marketingCategoryNames') {
+
+      productLookupService.marketingCategoryNames
+        .toList()
+        .subscribe { List<String> names ->
+
+        render Jackson.json(names)
+      }
+    }
+
     get(':ndcCode') {
 
       final String ndcCode = pathTokens.ndcCode

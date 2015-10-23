@@ -57,7 +57,7 @@ class ProductLookupService {
     mongoDatabase
       .getCollection(config.collection, Product)
       .find()
-      .limit(10)
+      .limit(5)
       .toObservable()
       .bindExec()
   }
@@ -67,6 +67,7 @@ class ProductLookupService {
     mongoDatabase
       .getCollection(config.collection, Product)
       .find(text(searchTerm))
+      .limit(5)
       .toObservable()
       .bindExec()
   }
@@ -77,6 +78,24 @@ class ProductLookupService {
       .getCollection(config.collection, Product)
       .find(eq('productNDC', ndcCode))
       .limit(10)
+      .toObservable()
+      .bindExec()
+  }
+
+  Observable<String> getProductTypeNames() {
+
+    mongoDatabase
+      .getCollection(config.collection, Product)
+      .distinct('productTypeName', String)
+      .toObservable()
+      .bindExec()
+  }
+
+  Observable<String> getMarketingCategoryNames() {
+
+    mongoDatabase
+      .getCollection(config.collection, Product)
+      .distinct('marketingCategoryName', String)
       .toObservable()
       .bindExec()
   }
