@@ -2,6 +2,14 @@ package io.durbs.ndc.chain
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
+import io.durbs.ndc.command.GetAllProducts
+import io.durbs.ndc.command.GetMarketingCategoryNames
+import io.durbs.ndc.command.GetProductTypeNames
+import io.durbs.ndc.command.GetProductsByNDCCode
+import io.durbs.ndc.command.GetRandomProduct
+import io.durbs.ndc.command.GetTeaserProducts
+import io.durbs.ndc.command.GetTotalNumberOfProductsCommand
+import io.durbs.ndc.command.SearchForProductsByTerm
 import io.durbs.ndc.config.RESTAPIConfig
 import io.durbs.ndc.service.ProductService
 import io.durbs.ndc.domain.product.Product
@@ -21,9 +29,21 @@ class ProductActionChain extends GroovyChainAction {
   @Override
   void execute() throws Exception {
 
+    get('count') {
+
+      new GetTotalNumberOfProductsCommand(productService)
+        .observe()
+        .single()
+        .subscribe { Long count ->
+
+        render Jackson.json(count)
+      }
+    }
+
     get('random') {
 
-      productService.getRandomProduct()
+      new GetRandomProduct(productService)
+        .observe()
         .single()
         .subscribe { Product product ->
 
@@ -35,7 +55,8 @@ class ProductActionChain extends GroovyChainAction {
 
       final String searchTerm = request.queryParams.q
 
-      productService.searchForProductsByTerms(searchTerm)
+      new SearchForProductsByTerm(productService, searchTerm)
+        .observe()
         .toList()
         .subscribe { List<Product> products ->
 
@@ -45,7 +66,8 @@ class ProductActionChain extends GroovyChainAction {
 
     get('productTypeNames') {
 
-      productService.productTypeNames
+      new GetProductTypeNames(productService)
+        .observe()
         .toList()
         .subscribe { List<String> names ->
 
@@ -55,7 +77,8 @@ class ProductActionChain extends GroovyChainAction {
 
     get('marketingCategoryNames') {
 
-      productService.marketingCategoryNames
+      new GetMarketingCategoryNames(productService)
+        .observe()
         .toList()
         .subscribe { List<String> names ->
 
@@ -65,7 +88,8 @@ class ProductActionChain extends GroovyChainAction {
 
     get('teaser') {
 
-      productService.teaserProducts
+      new GetTeaserProducts(productService)
+        .observe()
         .toList()
         .subscribe { List<Product> teaserProducts ->
 
@@ -77,7 +101,8 @@ class ProductActionChain extends GroovyChainAction {
 
       final String ndcCode = pathTokens.ndcCode
 
-      productService.getProductsByNDCCode(ndcCode)
+      new GetProductsByNDCCode(productService, ndcCode)
+        .observe()
         .single()
         .subscribe { Product product ->
         if (product) {
@@ -90,7 +115,8 @@ class ProductActionChain extends GroovyChainAction {
 
     get {
 
-      productService.getAllProducts()
+      new GetAllProducts(productService)
+        .observe()
         .toList()
         .subscribe { List<Product> products ->
 

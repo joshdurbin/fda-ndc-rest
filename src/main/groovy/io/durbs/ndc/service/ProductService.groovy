@@ -3,11 +3,8 @@ package io.durbs.ndc.service
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import com.mongodb.rx.client.MongoDatabase
-import com.netflix.hystrix.HystrixCommandGroupKey
-import com.netflix.hystrix.HystrixCommandKey
-import com.netflix.hystrix.HystrixObservableCommand
 import groovy.transform.CompileStatic
-
+import groovy.util.logging.Slf4j
 import io.durbs.ndc.domain.product.Product
 import rx.Observable
 import rx.functions.Func1
@@ -19,193 +16,94 @@ import static com.mongodb.client.model.Filters.text
 
 @CompileStatic
 @Singleton
+@Slf4j
 class ProductService {
 
   @Inject
   MongoDatabase mongoDatabase
 
   private static final String MONGO_COLLECTION = 'products'
-  private static final HystrixCommandGroupKey HYSTRIX_COMMAND_GROUP_KEY = HystrixCommandGroupKey.Factory.asKey('product-service')
   private static final List<String> TEASER_PRODUCT_PROPERTIES = [ 'productNDC', 'proprietaryName', 'startMarketingDate', 'endMarketingDate', 'labelerName', 'substances' ]
 
   Observable<Long> getTotalNumberOfProducts() {
 
-    new HystrixObservableCommand<Long>(
-      HystrixObservableCommand.Setter.withGroupKey(HYSTRIX_COMMAND_GROUP_KEY).andCommandKey(HystrixCommandKey.Factory.asKey('get-total-number-of-products'))) {
-
-      @Override
-      protected Observable<Long> construct() {
-
-        mongoDatabase
-          .getCollection(MONGO_COLLECTION, Product)
-          .count()
-      }
-
-      @Override
-      protected Observable<Long> resumeWithFallback() {
-
-        Observable.just(0L)
-      }
-    }.toObservable().bindExec()
+    mongoDatabase
+      .getCollection(MONGO_COLLECTION, Product)
+      .count()
+      .bindExec()
   }
 
   Observable<Product> getAllProducts() {
 
-    new HystrixObservableCommand<Product>(
-      HystrixObservableCommand.Setter.withGroupKey(HYSTRIX_COMMAND_GROUP_KEY).andCommandKey(HystrixCommandKey.Factory.asKey('get-all-products'))) {
-
-      @Override
-      protected Observable<Product> construct() {
-
-        mongoDatabase
-          .getCollection(MONGO_COLLECTION, Product)
-          .find()
-          .limit(20)
-          .toObservable()
-      }
-
-      @Override
-      protected Observable<Product> resumeWithFallback() {
-
-        Observable.empty()
-      }
-    }.toObservable().bindExec()
+    mongoDatabase
+      .getCollection(MONGO_COLLECTION, Product)
+      .find()
+      .limit(20)
+      .toObservable()
+      .bindExec()
   }
 
   Observable<Product> searchForProductsByTerms(final String searchTerm) {
 
-    new HystrixObservableCommand<Product>(
-      HystrixObservableCommand.Setter.withGroupKey(HYSTRIX_COMMAND_GROUP_KEY).andCommandKey(HystrixCommandKey.Factory.asKey('search-for-products-by-term'))) {
-
-      @Override
-      protected Observable<Product> construct() {
-
-        mongoDatabase
-          .getCollection(MONGO_COLLECTION, Product)
-          .find(text(searchTerm))
-          .limit(20)
-          .toObservable()
-      }
-
-      @Override
-      protected Observable<Product> resumeWithFallback() {
-
-        Observable.empty()
-      }
-    }.toObservable().bindExec()
+    mongoDatabase
+      .getCollection(MONGO_COLLECTION, Product)
+      .find(text(searchTerm))
+      .limit(20)
+      .toObservable()
+      .bindExec()
   }
 
   Observable<Product> getProductsByNDCCode(final String ndcCode) {
 
-    new HystrixObservableCommand<Product>(
-      HystrixObservableCommand.Setter.withGroupKey(HYSTRIX_COMMAND_GROUP_KEY).andCommandKey(HystrixCommandKey.Factory.asKey('get-products-by-ndc-code'))) {
-
-      @Override
-      protected Observable<Product> construct() {
-
-        mongoDatabase
-          .getCollection(MONGO_COLLECTION, Product)
-          .find(eq('productNDC', ndcCode))
-          .limit(20)
-          .toObservable()
-      }
-
-      @Override
-      protected Observable<Product> resumeWithFallback() {
-
-        Observable.empty()
-      }
-    }.toObservable().bindExec()
+    mongoDatabase
+      .getCollection(MONGO_COLLECTION, Product)
+      .find(eq('productNDC', ndcCode))
+      .limit(20)
+      .toObservable()
+      .bindExec()
   }
 
   Observable<String> getProductTypeNames() {
 
-    new HystrixObservableCommand<String>(
-      HystrixObservableCommand.Setter.withGroupKey(HYSTRIX_COMMAND_GROUP_KEY).andCommandKey(HystrixCommandKey.Factory.asKey('get-product-type-names'))) {
-
-      @Override
-      protected Observable<String> construct() {
-
-        mongoDatabase
-          .getCollection(MONGO_COLLECTION, Product)
-          .distinct('productTypeName', String)
-          .toObservable()
-      }
-
-      @Override
-      protected Observable<String> resumeWithFallback() {
-
-        Observable.empty()
-      }
-    }.toObservable().bindExec()
+    mongoDatabase
+      .getCollection(MONGO_COLLECTION, Product)
+      .distinct('productTypeName', String)
+      .toObservable()
+      .bindExec()
   }
 
   Observable<String> getMarketingCategoryNames() {
 
-    new HystrixObservableCommand<String>(
-      HystrixObservableCommand.Setter.withGroupKey(HYSTRIX_COMMAND_GROUP_KEY).andCommandKey(HystrixCommandKey.Factory.asKey('get-marketing-category-names'))) {
-
-      @Override
-      protected Observable<String> construct() {
-
-        mongoDatabase
-          .getCollection(MONGO_COLLECTION, Product)
-          .distinct('marketingCategoryName', String)
-          .toObservable()
-      }
-
-      @Override
-      protected Observable<String> resumeWithFallback() {
-
-        Observable.empty()
-      }
-    }.toObservable().bindExec()
+    mongoDatabase
+      .getCollection(MONGO_COLLECTION, Product)
+      .distinct('marketingCategoryName', String)
+      .toObservable()
+      .bindExec()
   }
 
   Observable<Product> getRandomProduct() {
 
-    new HystrixObservableCommand<Product>(
-      HystrixObservableCommand.Setter.withGroupKey(HYSTRIX_COMMAND_GROUP_KEY).andCommandKey(HystrixCommandKey.Factory.asKey('get-random-product'))) {
+    getTotalNumberOfProducts().flatMap({ Long totalNumberOfProducts ->
 
-      @Override
-      protected Observable<Product> construct() {
+      mongoDatabase
+        .getCollection(MONGO_COLLECTION, Product)
+        .find()
+        .limit(1)
+        .skip(Math.floor(Math.random() * totalNumberOfProducts) as Integer)
+        .toObservable()
 
-        getTotalNumberOfProducts().flatMap({ Long totalNumberOfProducts ->
-
-          mongoDatabase
-            .getCollection(MONGO_COLLECTION, Product)
-            .find()
-            .limit(1)
-            .skip(Math.floor(Math.random() * totalNumberOfProducts) as Integer)
-            .toObservable()
-        } as Func1)
-      }
-
-    }.toObservable().bindExec()
+    } as Func1).bindExec()
   }
 
   Observable<Product> getTeaserProducts() {
 
-    new HystrixObservableCommand<Product>(
-      HystrixObservableCommand.Setter.withGroupKey(HYSTRIX_COMMAND_GROUP_KEY).andCommandKey(HystrixCommandKey.Factory.asKey('get-teaser-products'))) {
-
-      @Override
-      protected Observable<Product> construct() {
-
-        mongoDatabase
-          .getCollection(MONGO_COLLECTION, Product)
-          .find()
-          .limit(20)
-          .projection(fields(include(TEASER_PRODUCT_PROPERTIES)))
-          .toObservable()
-      }
-
-      @Override
-      protected Observable<Product> resumeWithFallback() {
-
-        Observable.empty()
-      }
-    }.toObservable().bindExec()
+    mongoDatabase
+      .getCollection(MONGO_COLLECTION, Product)
+      .find()
+      .limit(20)
+      .projection(fields(include(TEASER_PRODUCT_PROPERTIES)))
+      .toObservable()
+      .bindExec()
   }
 
 }
