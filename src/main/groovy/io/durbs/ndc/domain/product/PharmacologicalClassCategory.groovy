@@ -1,13 +1,12 @@
-package io.durbs.ndc.domain
+package io.durbs.ndc.domain.product
 
 import groovy.transform.Canonical
 import groovy.transform.CompileStatic
 
 @Canonical
 @CompileStatic
-class Substance {
+class PharmacologicalClassCategory {
 
   String name
-  Double activeNumeratorStrength
-  String activeIngredUnit
+  String code
 }

@@ -1,17 +1,13 @@
-package io.durbs.ndc
+package io.durbs.ndc.config
 
 import groovy.transform.CompileStatic
 import groovy.transform.Immutable
 
-@CompileStatic
 @Immutable
-class NDCRestConfig {
+@CompileStatic
+class RESTAPIConfig {
 
   Integer defaultResultsPageSize
   Integer maxResultsPageSize
   Integer defaultFirstPage
-
-  String db
-  String uri
-  String collection
 }

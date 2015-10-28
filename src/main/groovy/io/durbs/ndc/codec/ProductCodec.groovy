@@ -1,9 +1,9 @@
-package io.durbs.ndc
+package io.durbs.ndc.codec
 
-import io.durbs.ndc.domain.Packaging
-import io.durbs.ndc.domain.PharmacologicalClassCategory
-import io.durbs.ndc.domain.Product
-import io.durbs.ndc.domain.Substance
+import io.durbs.ndc.domain.product.Packaging
+import io.durbs.ndc.domain.product.PharmacologicalClassCategory
+import io.durbs.ndc.domain.product.Product
+import io.durbs.ndc.domain.product.Substance
 import org.bson.BsonReader
 import org.bson.BsonWriter
 import org.bson.Document

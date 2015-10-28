@@ -1,8 +1,11 @@
-package io.durbs.ndc
+package io.durbs.ndc.chain
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
-import io.durbs.ndc.domain.Product
+import io.durbs.ndc.config.RESTAPIConfig
+import io.durbs.ndc.service.ProductService
+import io.durbs.ndc.domain.product.Product
+
 import ratpack.groovy.handling.GroovyChainAction
 import ratpack.jackson.Jackson
 
@@ -10,16 +13,29 @@ import ratpack.jackson.Jackson
 class ProductActionChain extends GroovyChainAction {
 
   @Inject
-  ProductLookupService productLookupService
+  ProductService productService
+
+  @Inject
+  RESTAPIConfig restAPIConfig
 
   @Override
   void execute() throws Exception {
+
+    get('random') {
+
+      productService.getRandomProduct()
+        .single()
+        .subscribe { Product product ->
+
+        render Jackson.json(product)
+      }
+    }
 
     get('search') {
 
       final String searchTerm = request.queryParams.q
 
-      productLookupService.search(searchTerm)
+      productService.searchForProductsByTerms(searchTerm)
         .toList()
         .subscribe { List<Product> products ->
 
@@ -29,7 +45,7 @@ class ProductActionChain extends GroovyChainAction {
 
     get('productTypeNames') {
 
-      productLookupService.productTypeNames
+      productService.productTypeNames
         .toList()
         .subscribe { List<String> names ->
 
@@ -39,7 +55,7 @@ class ProductActionChain extends GroovyChainAction {
 
     get('marketingCategoryNames') {
 
-      productLookupService.marketingCategoryNames
+      productService.marketingCategoryNames
         .toList()
         .subscribe { List<String> names ->
 
@@ -47,11 +63,21 @@ class ProductActionChain extends GroovyChainAction {
       }
     }
 
+    get('teaser') {
+
+      productService.teaserProducts
+        .toList()
+        .subscribe { List<Product> teaserProducts ->
+
+        render Jackson.json(teaserProducts)
+      }
+    }
+
     get(':ndcCode') {
 
       final String ndcCode = pathTokens.ndcCode
 
-      productLookupService.getByNDCCode(ndcCode)
+      productService.getProductsByNDCCode(ndcCode)
         .single()
         .subscribe { Product product ->
         if (product) {
@@ -63,7 +89,8 @@ class ProductActionChain extends GroovyChainAction {
     }
 
     get {
-      productLookupService.getAll()
+
+      productService.getAllProducts()
         .toList()
         .subscribe { List<Product> products ->
 
