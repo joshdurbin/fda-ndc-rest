@@ -10,6 +10,7 @@ import groovy.transform.CompileStatic
 
 import io.durbs.ndc.domain.product.Product
 import rx.Observable
+import rx.functions.Func1
 
 import static com.mongodb.client.model.Projections.fields
 import static com.mongodb.client.model.Projections.include
@@ -163,25 +164,24 @@ class ProductService {
 
   Observable<Product> getRandomProduct() {
 
-//    new HystrixObservableCommand<Product>(
-//      HystrixObservableCommand.Setter.withGroupKey(HYSTRIX_COMMAND_GROUP_KEY).andCommandKey(HystrixCommandKey.Factory.asKey('get-random-product'))) {
-//
-//      @Override
-//      protected Observable<Product> construct() {
+    new HystrixObservableCommand<Product>(
+      HystrixObservableCommand.Setter.withGroupKey(HYSTRIX_COMMAND_GROUP_KEY).andCommandKey(HystrixCommandKey.Factory.asKey('get-random-product'))) {
 
-        getTotalNumberOfProducts().flatMap {
+      @Override
+      protected Observable<Product> construct() {
+
+        getTotalNumberOfProducts().flatMap({ Long totalNumberOfProducts ->
 
           mongoDatabase
             .getCollection(MONGO_COLLECTION, Product)
             .find()
             .limit(1)
-            .skip(Math.floor(Math.random() * it) as Integer)
+            .skip(Math.floor(Math.random() * totalNumberOfProducts) as Integer)
             .toObservable()
-            .bindExec()
-        }
-//      }
-//
-//    }.toObservable().bindExec()
+        } as Func1)
+      }
+
+    }.toObservable().bindExec()
   }
 
   Observable<Product> getTeaserProducts() {
