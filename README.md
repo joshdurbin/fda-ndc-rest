@@ -15,21 +15,13 @@ Data load procedures:
 7. Establish indexes on collection
 
   ```javascript
-  db.products.createIndex(
-  {
-    applicationNumber: 1,
-    labelerName: 1,
-    marketingCategoryName: 1,
-    productID: 1,
-    productNDC: 1,  
-    productTypeName: 1,
-    "pharmacologicalClassCategories.code": 1,
-    startMarketingDate: 1    
-  },
-  {
-    name: "Non Text Indexes"
-  }
-)
+  db.products.createIndex({productNDC: 1}, {name: "NDC Code Index"})
+  db.products.createIndex({applicationNumber: 1}, {name: "Application Number Index"})
+  db.products.createIndex({labelerName: 1}, {name: "Labeler Name Index"})
+  db.products.createIndex({startMarketingDate: 1,
+    endMarketingDate: 1}, {name: "Marketing Start/End Date Index"})
+  db.products.createIndex({productTypeName: 1}, {name: "Product Type Index"})
+  db.products.createIndex({marketingCategoryName: 1}, {name: "Marketing Category Name Index"})
 ```
 
 8. Establish text indexes on collection
