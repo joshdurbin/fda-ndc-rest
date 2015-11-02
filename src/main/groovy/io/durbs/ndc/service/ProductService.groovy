@@ -3,6 +3,7 @@ package io.durbs.ndc.service
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import com.mongodb.rx.client.MongoDatabase
+import com.mongodb.rx.client.Success
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import io.durbs.ndc.domain.product.Product
@@ -23,7 +24,12 @@ class ProductService {
   MongoDatabase mongoDatabase
 
   private static final String MONGO_COLLECTION = 'products'
-  private static final List<String> TEASER_PRODUCT_PROPERTIES = [ 'productNDC', 'proprietaryName', 'startMarketingDate', 'endMarketingDate', 'labelerName', 'substances' ]
+  private static final List<String> TEASER_PRODUCT_PROPERTIES = [ 'productNDC',
+                                                                  'proprietaryName',
+                                                                  'startMarketingDate',
+                                                                  'endMarketingDate',
+                                                                  'labelerName',
+                                                                  'substances' ]
 
   Observable<Long> getTotalNumberOfProducts() {
 
@@ -38,7 +44,7 @@ class ProductService {
     mongoDatabase
       .getCollection(MONGO_COLLECTION, Product)
       .find()
-      .limit(20)
+      .limit(5)
       .toObservable()
       .bindExec()
   }
@@ -85,6 +91,8 @@ class ProductService {
 
     getTotalNumberOfProducts().flatMap({ Long totalNumberOfProducts ->
 
+      log.info("Selecting, random product, skipping ${totalNumberOfProducts} products...")
+
       mongoDatabase
         .getCollection(MONGO_COLLECTION, Product)
         .find()
@@ -103,6 +111,15 @@ class ProductService {
       .limit(20)
       .projection(fields(include(TEASER_PRODUCT_PROPERTIES)))
       .toObservable()
+      .bindExec()
+  }
+
+  Observable<Success> saveProduct(final Product product) {
+
+    mongoDatabase
+      .getCollection(MONGO_COLLECTION, Product)
+      .insertOne(product)
+      .asObservable()
       .bindExec()
   }
 
