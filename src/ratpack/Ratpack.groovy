@@ -7,6 +7,7 @@ import io.durbs.ndc.NDCRestModule
 import io.durbs.ndc.chain.ProductActionChain
 import io.durbs.ndc.config.MongoConfig
 import io.durbs.ndc.config.RESTAPIConfig
+import io.durbs.ndc.config.RedisConfig
 import ratpack.config.ConfigData
 import ratpack.hystrix.HystrixMetricsEventStreamHandler
 import ratpack.hystrix.HystrixModule
@@ -27,6 +28,7 @@ ratpack {
 
     bindInstance(MongoConfig, configData.get('/mongo', MongoConfig))
     bindInstance(RESTAPIConfig, configData.get('/api', RESTAPIConfig))
+    bindInstance(RedisConfig, configData.get('/redis', RedisConfig))
 
     bindInstance(ObjectMapper, new ObjectMapper()
       .registerModule(new JavaTimeModule())

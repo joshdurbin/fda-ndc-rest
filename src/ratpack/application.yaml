@@ -1,3 +1,5 @@
+redis:
+  uri: redis://localhost
 mongo:
   db: fda-ndc-rest
   uri: mongodb://localhost/fda-ndc-rest

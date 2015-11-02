@@ -3,6 +3,8 @@ package io.durbs.ndc
 import com.google.inject.AbstractModule
 import com.google.inject.Provides
 import com.google.inject.Singleton
+import com.lambdaworks.redis.RedisClient
+import com.lambdaworks.redis.api.rx.RedisReactiveCommands
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClient
 import com.mongodb.async.client.MongoClientSettings
@@ -18,6 +20,7 @@ import groovy.util.logging.Slf4j
 import io.durbs.ndc.chain.ProductActionChain
 import io.durbs.ndc.codec.ProductCodec
 import io.durbs.ndc.config.MongoConfig
+import io.durbs.ndc.config.RedisConfig
 import io.durbs.ndc.service.ProductService
 import org.bson.codecs.configuration.CodecRegistries
 import org.bson.codecs.configuration.CodecRegistry
@@ -31,6 +34,15 @@ class NDCRestModule extends AbstractModule {
 
     bind(ProductActionChain)
     bind(ProductService)
+  }
+
+  @Provides
+  @Singleton
+  RedisReactiveCommands<String, String> provideRedisClient(RedisConfig redisConfig) {
+
+    final RedisClient redisClient = RedisClient.create(redisConfig.uri)
+    redisClient.connect().reactive()
+
   }
 
   @Provides
@@ -51,8 +63,6 @@ class NDCRestModule extends AbstractModule {
       .sslSettings(SslSettings.builder().applyConnectionString(connectionString).build())
       .socketSettings(SocketSettings.builder().applyConnectionString(connectionString).build())
       .build()
-
-    log.info("Creaitng MongoDatabase")
 
     MongoClients.create(mongoClientSettings).getDatabase(mongoConfig.db)
   }
