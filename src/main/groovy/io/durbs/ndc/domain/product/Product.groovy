@@ -9,6 +9,7 @@ import java.time.LocalDate
 @CompileStatic
 class Product {
 
+  String id
   String productID
   String productNDC
   String productTypeName
