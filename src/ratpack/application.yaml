@@ -1,9 +1,15 @@
 redis:
   uri: redis://localhost
+  cacheTTLInSeconds: 3600
 mongo:
   db: fda-ndc-rest
   uri: mongodb://localhost/fda-ndc-rest
 api:
   defaultResultsPageSize: 20
   maxResultsPageSize: 50
-  defaultFirstPage: 1
+  defaultFirstPage: 0
+  teaserProductProperties: productNDC,proprietaryName,startMarketingDate,endMarketingDate,labelerName,substances
+  sortProperties: startMarketingDate,productTypeName,marketingCategoryName,labelerName
+  defaultRateLimitCeiling:
+  defaultRateLimitRemaining:
+  defaultRateLimitNextWindow:

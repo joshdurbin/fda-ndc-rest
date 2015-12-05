@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 
 import io.durbs.ndc.NDCRestModule
-import io.durbs.ndc.chain.ProductActionChain
+import io.durbs.ndc.chain.ProductAPIActionChain
+import io.durbs.ndc.chain.ProductAPIAuthActionChain
+
 import io.durbs.ndc.config.MongoConfig
 import io.durbs.ndc.config.RESTAPIConfig
 import io.durbs.ndc.config.RedisConfig
@@ -55,8 +57,10 @@ ratpack {
       render('loaderio-69848b6992185269cd57a7fc9d760715')
     }
 
+    all chain(registry.get(ProductAPIAuthActionChain))
+
     prefix('api/v0/product') {
-      all chain(registry.get(ProductActionChain))
+      all chain(registry.get(ProductAPIActionChain))
     }
 
     get('hystrix.stream', new HystrixMetricsEventStreamHandler())

@@ -5,7 +5,7 @@ import groovy.transform.CompileStatic
 
 @Canonical
 @CompileStatic
-class PharmacologicalClassCategory {
+class PharmacologicalClassCategory implements Serializable {
 
   String name
   String code

@@ -1,12 +1,11 @@
-package io.durbs.ndc.config
+package io.durbs.ndc.domain
 
 import groovy.transform.CompileStatic
 import groovy.transform.Immutable
 
 @CompileStatic
 @Immutable
-class RedisConfig {
+class APIAuthResult {
 
-  String uri
-  Long cacheTTLInSeconds
+  Boolean authenticated
 }

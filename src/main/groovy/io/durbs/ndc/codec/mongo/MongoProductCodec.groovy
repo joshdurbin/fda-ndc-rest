@@ -1,4 +1,4 @@
-package io.durbs.ndc.codec
+package io.durbs.ndc.codec.mongo
 
 import io.durbs.ndc.domain.product.Packaging
 import io.durbs.ndc.domain.product.PharmacologicalClassCategory
@@ -20,7 +20,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 
-class ProductCodec implements CollectibleCodec<Product> {
+class MongoProductCodec implements CollectibleCodec<Product> {
 
   static final Codec<Document> documentCodec = new DocumentCodec()
 
@@ -29,7 +29,8 @@ class ProductCodec implements CollectibleCodec<Product> {
 
     final Document document = documentCodec.decode(reader, decoderContext)
 
-    new Product(productID: document.getString('productID'),
+    new Product(randomKey: document.getDouble('randomKey'),
+      productID: document.getString('productID'),
       productNDC: document.getString('productNDC'),
       productTypeName: document.getString('productTypeName'),
       proprietaryName: document.getString('proprietaryName'),
@@ -63,6 +64,15 @@ class ProductCodec implements CollectibleCodec<Product> {
   void encode(final BsonWriter writer, final Product product, final EncoderContext encoderContext) {
 
     final Document document = new Document()
+
+    if (product.randomKey) {
+      document.put('randomKey', product.randomKey)
+    } else {
+
+      final Random random = new Random()
+
+      document.put('randomKey', random.nextDouble())
+    }
 
     if (product.productID) {
       document.put('productID', product.productID)

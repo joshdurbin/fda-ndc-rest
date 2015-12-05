@@ -17,11 +17,18 @@ import com.mongodb.rx.client.MongoClients
 import com.mongodb.rx.client.MongoDatabase
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import io.durbs.ndc.chain.ProductActionChain
-import io.durbs.ndc.codec.ProductCodec
+import io.durbs.ndc.chain.ProductAPIActionChain
+import io.durbs.ndc.chain.ProductAPIAuthActionChain
+
+import io.durbs.ndc.codec.mongo.MongoProductCodec
+import io.durbs.ndc.codec.mongo.MongoUserCodec
+import io.durbs.ndc.codec.redis.RedisProductCodec
 import io.durbs.ndc.config.MongoConfig
 import io.durbs.ndc.config.RedisConfig
+import io.durbs.ndc.domain.product.Product
+
 import io.durbs.ndc.service.ProductService
+import io.durbs.ndc.service.UserService
 import org.bson.codecs.configuration.CodecRegistries
 import org.bson.codecs.configuration.CodecRegistry
 
@@ -32,17 +39,26 @@ class NDCRestModule extends AbstractModule {
   @Override
   protected void configure() {
 
-    bind(ProductActionChain)
+    bind(ProductAPIActionChain)
+    bind(ProductAPIAuthActionChain)
     bind(ProductService)
+    bind(UserService)
   }
 
   @Provides
   @Singleton
-  RedisReactiveCommands<String, String> provideRedisClient(RedisConfig redisConfig) {
+  RedisReactiveCommands<String, String> stringRedisCommands(RedisConfig redisConfig) {
 
     final RedisClient redisClient = RedisClient.create(redisConfig.uri)
     redisClient.connect().reactive()
+  }
 
+  @Provides
+  @Singleton
+  RedisReactiveCommands<String, Product> productRedisCommands(RedisConfig redisConfig) {
+
+    final RedisClient redisClient = RedisClient.create(redisConfig.uri)
+    redisClient.connect(new RedisProductCodec()).reactive()
   }
 
   @Provides
@@ -53,7 +69,7 @@ class NDCRestModule extends AbstractModule {
 
     final CodecRegistry codecRegistry = CodecRegistries.fromRegistries(
       MongoClient.getDefaultCodecRegistry(),
-      CodecRegistries.fromCodecs(new ProductCodec()))
+      CodecRegistries.fromCodecs(new MongoProductCodec(), new MongoUserCodec()))
 
     final MongoClientSettings mongoClientSettings = MongoClientSettings.builder()
       .codecRegistry(codecRegistry)
