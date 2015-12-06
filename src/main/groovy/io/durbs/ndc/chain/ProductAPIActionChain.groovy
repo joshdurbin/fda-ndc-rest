@@ -1,33 +1,20 @@
 package io.durbs.ndc.chain
 
-import com.google.inject.Inject
 import com.google.inject.Singleton
-import com.lambdaworks.redis.api.rx.RedisReactiveCommands
 import io.durbs.ndc.command.api.GetActiveProducts
 import io.durbs.ndc.command.api.GetAllProducts
 import io.durbs.ndc.command.api.GetInactiveProducts
 import io.durbs.ndc.command.api.GetMarketingCategoryNames
 import io.durbs.ndc.command.api.GetProductTypeNames
-import io.durbs.ndc.command.api.GetProductsByNDCCode.GetProductsByNDCCodeRequestParameters
 import io.durbs.ndc.command.api.GetProductsByNDCCodeCached
 import io.durbs.ndc.command.api.GetRandomProduct
 import io.durbs.ndc.command.api.SearchForProductsByTerm
-import io.durbs.ndc.service.ProductService
 import io.durbs.ndc.domain.product.Product
 import ratpack.groovy.handling.GroovyChainAction
 import ratpack.jackson.Jackson
 
 @Singleton
 class ProductAPIActionChain extends GroovyChainAction {
-
-  @Inject
-  ProductService productService
-
-  @Inject
-  RedisReactiveCommands<String, Product> redisProductsCache
-
-  @Inject
-  RedisReactiveCommands<String, String> redisStringCache
 
   @Override
   void execute() throws Exception {
@@ -78,7 +65,7 @@ class ProductAPIActionChain extends GroovyChainAction {
 
     get('types') {
 
-      new GetProductTypeNames(productService)
+      new GetProductTypeNames(context)
         .observe()
         .toList()
         .subscribe { List<String> names ->
@@ -94,7 +81,7 @@ class ProductAPIActionChain extends GroovyChainAction {
 
     get('marketingCategories') {
 
-      new GetMarketingCategoryNames(productService, redisStringCache)
+      new GetMarketingCategoryNames(context)
         .observe()
         .toList()
         .subscribe { List<String> names ->
@@ -110,7 +97,7 @@ class ProductAPIActionChain extends GroovyChainAction {
 
     get(':ndcCode') {
 
-      new GetProductsByNDCCodeCached(productService, redisProductsCache, new GetProductsByNDCCodeRequestParameters(context))
+      new GetProductsByNDCCodeCached(context)
         .observe()
         .single()
         .subscribe { Product product ->

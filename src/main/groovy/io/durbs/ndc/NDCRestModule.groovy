@@ -26,7 +26,7 @@ import io.durbs.ndc.codec.redis.RedisProductCodec
 import io.durbs.ndc.config.MongoConfig
 import io.durbs.ndc.config.RedisConfig
 import io.durbs.ndc.domain.product.Product
-
+import io.durbs.ndc.service.CacheService
 import io.durbs.ndc.service.ProductService
 import io.durbs.ndc.service.UserService
 import org.bson.codecs.configuration.CodecRegistries
@@ -43,6 +43,7 @@ class NDCRestModule extends AbstractModule {
     bind(ProductAPIAuthActionChain)
     bind(ProductService)
     bind(UserService)
+    bind(CacheService)
   }
 
   @Provides
