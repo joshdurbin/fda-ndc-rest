@@ -1,46 +1,51 @@
 package io.durbs.ndc.codec.redis
 
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.google.common.base.Charsets
+import com.google.inject.Singleton
 import com.lambdaworks.redis.codec.RedisCodec
+import groovy.transform.CompileStatic
 import io.durbs.ndc.domain.product.Product
 
 import java.nio.ByteBuffer
 
+@Singleton
+@CompileStatic
 class RedisProductCodec implements RedisCodec<String, Product> {
+
+  static ObjectMapper objectMapper = new ObjectMapper()
+    .registerModule(new JavaTimeModule())
+    .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+    .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+    .setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
 
   @Override
   String decodeKey(ByteBuffer bytes) {
+
     Charsets.UTF_8.decode(bytes).toString()
   }
 
   @Override
-  Product decodeValue(ByteBuffer bytes) {
+  Product decodeValue(ByteBuffer byteBuffer) {
 
-    byte[] byts = new byte[bytes.capacity()];
-    bytes.get(byts);
+    final byte[] bytes = new byte[byteBuffer.remaining()]
+    byteBuffer.duplicate().get(bytes)
 
-    ObjectInputStream istream = new ObjectInputStream(new ByteArrayInputStream(byts));
-    Object readObject = istream.readObject()
-    readObject as Product
+    objectMapper.readValue(new String(bytes, Charsets.UTF_8), Product)
   }
 
   @Override
   ByteBuffer encodeKey(String key) {
+
     Charsets.UTF_8.encode(key)
   }
 
   @Override
-  ByteBuffer encodeValue(Product value) {
+  ByteBuffer encodeValue(Product product) {
 
-    ByteArrayOutputStream result = new ByteArrayOutputStream()
-    ObjectOutputStream outputStream = new ObjectOutputStream(result)
-    outputStream.writeObject(value)
-    outputStream.close()
-
-    ByteBuffer buffer = ByteBuffer.allocate(result.size())
-    buffer.put(result.toByteArray())
-    buffer.flip()
-
-    buffer
+    ByteBuffer.wrap(objectMapper.writeValueAsString(product).getBytes(Charsets.UTF_8))
   }
 }

@@ -3,13 +3,12 @@ package io.durbs.ndc.domain.product
 import com.fasterxml.jackson.annotation.JsonIgnore
 import groovy.transform.Canonical
 import groovy.transform.CompileStatic
-import org.msgpack.annotation.Message
 
 import java.time.LocalDate
 
 @Canonical
 @CompileStatic
-class Product implements Serializable {
+class Product {
 
   @JsonIgnore
   String id

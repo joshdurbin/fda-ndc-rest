@@ -30,7 +30,8 @@ class GetMarketingCategoryNames extends HystrixObservableCommand<String> {
     cacheService.stringsCache.smembers(CACHE_KEY).bindExec()
       .switchIfEmpty(
         productService.getDistinctList(DISTINCT_PROPERTY_KEY)
-        .doOnNext { String categoryName -> cacheService.stringsCache.sadd(CACHE_KEY, categoryName).subscribe() }
+        .doOnNext { String categoryName ->
+          cacheService.stringsCache.sadd(CACHE_KEY, categoryName).subscribe() }
       )
   }
 }

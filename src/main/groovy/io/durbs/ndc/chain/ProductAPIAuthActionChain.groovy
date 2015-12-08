@@ -5,7 +5,7 @@ import com.google.inject.Singleton
 import com.lambdaworks.redis.api.rx.RedisReactiveCommands
 import io.durbs.ndc.command.auth.ValidateBearerToken
 import io.durbs.ndc.domain.APIAuthResult
-
+import io.durbs.ndc.service.CacheService
 import ratpack.groovy.handling.GroovyChainAction
 
 @Singleton
@@ -18,7 +18,7 @@ class ProductAPIAuthActionChain extends GroovyChainAction {
   static final String RATE_LIMIT_NEXT_WINDOW_HEADER_KEY = 'X-Rate-Limit-Next-Window'
 
   @Inject
-  RedisReactiveCommands<String, String> stringRedisCommands
+  CacheService cacheService
 
   @Override
   void execute() throws Exception {
@@ -27,7 +27,7 @@ class ProductAPIAuthActionChain extends GroovyChainAction {
 
       if (request.headers.contains(API_KEY_HEADER_KEY)) {
 
-        new ValidateBearerToken(stringRedisCommands, request.headers.get(API_KEY_HEADER_KEY))
+        new ValidateBearerToken(cacheService, request.headers.get(API_KEY_HEADER_KEY))
           .observe()
           .singleOrDefault('')
           .subscribe { String value ->

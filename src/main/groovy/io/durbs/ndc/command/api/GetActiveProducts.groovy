@@ -15,6 +15,8 @@ import static com.mongodb.client.model.Filters.exists
 import static com.mongodb.client.model.Filters.gte
 import static com.mongodb.client.model.Filters.lte
 import static com.mongodb.client.model.Filters.or
+import static com.mongodb.client.model.Sorts.descending
+import static com.mongodb.client.model.Sorts.orderBy
 
 @CompileStatic
 class GetActiveProducts extends HystrixObservableCommand<Product> {
@@ -47,8 +49,21 @@ class GetActiveProducts extends HystrixObservableCommand<Product> {
 
     Bson getQueryFilter() {
 
-      and(lte('startMarketingDate', new Date()), or(exists('endMarketingDate', false), gte('endMarketingDate', new Date())))
+      final Date now = new Date()
+
+      and(lte('startMarketingDate', now), or(exists('endMarketingDate', false), gte('endMarketingDate', now)))
+    }
+
+    Bson getSortCriteria() {
+
+      if (context.request.queryParams.containsKey(SORT_ASCENDING_QUERY_PARAM_KEY)
+        || context.request.queryParams.containsKey(SORT_DESCENDING_QUERY_PARAM_KEY)) {
+
+        super.sortCriteria
+      } else {
+
+        orderBy(descending('startMarketingDate'))
+      }
     }
   }
-
 }

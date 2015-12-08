@@ -5,7 +5,7 @@ import groovy.transform.CompileStatic
 
 @Canonical
 @CompileStatic
-class Packaging implements Serializable {
+class Packaging {
 
   String ndcPackageCode
   String packageDescription

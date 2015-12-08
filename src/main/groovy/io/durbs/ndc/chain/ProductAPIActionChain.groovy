@@ -6,7 +6,7 @@ import io.durbs.ndc.command.api.GetAllProducts
 import io.durbs.ndc.command.api.GetInactiveProducts
 import io.durbs.ndc.command.api.GetMarketingCategoryNames
 import io.durbs.ndc.command.api.GetProductTypeNames
-import io.durbs.ndc.command.api.GetProductsByNDCCodeCached
+import io.durbs.ndc.command.api.GetProductsByNDCCode
 import io.durbs.ndc.command.api.GetRandomProduct
 import io.durbs.ndc.command.api.SearchForProductsByTerm
 import io.durbs.ndc.domain.product.Product
@@ -97,7 +97,7 @@ class ProductAPIActionChain extends GroovyChainAction {
 
     get(':ndcCode') {
 
-      new GetProductsByNDCCodeCached(context)
+      new GetProductsByNDCCode(context)
         .observe()
         .single()
         .subscribe { Product product ->

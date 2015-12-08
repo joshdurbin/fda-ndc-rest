@@ -44,6 +44,7 @@ class NDCRestModule extends AbstractModule {
     bind(ProductService)
     bind(UserService)
     bind(CacheService)
+    bind(RedisProductCodec)
   }
 
   @Provides
@@ -59,6 +60,8 @@ class NDCRestModule extends AbstractModule {
   RedisReactiveCommands<String, Product> productRedisCommands(RedisConfig redisConfig) {
 
     final RedisClient redisClient = RedisClient.create(redisConfig.uri)
+
+    //redisClient.connect(CompressionCodec.valueCompressor(new RedisProductCodec(), CompressionCodec.CompressionType.GZIP)).reactive()
     redisClient.connect(new RedisProductCodec()).reactive()
   }
 

@@ -5,7 +5,7 @@ import groovy.transform.CompileStatic
 
 @Canonical
 @CompileStatic
-class Substance implements Serializable {
+class Substance {
 
   String name
   Double activeNumeratorStrength
