@@ -1,6 +1,6 @@
 {
   "name": "fda-ndc-rest",
-  "description": "FDA National Drug Registry REST service built atop Ratpack, MxMongo hosted at Heroku.",
+  "description": "FDA National Drug Registry REST service built atop Ratpack, RxMongo hosted at Heroku.",
   "keywords": [
     "groovy",
     "ratpack",
@@ -9,7 +9,8 @@
     "rxmongo"
   ],
   "addons": [
-    "mongolab:sandbox"
+    'mongolab:sandbox'
+    'heroku-redis:hobby-dev'
   ],
   "env": {
     "BUILDPACK_URL": "https://github.com/heroku/heroku-buildpack-gradle",
