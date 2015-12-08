@@ -17,7 +17,7 @@ Data load procedures:
   ```javascript
   db.products.createIndex({productNDC: 1}, {name: "NDC Code Index"})
   db.products.createIndex({labelerName: 1}, {name: "Labeler Name Index"})
-  db.products.createIndex({startMarketingDate: 1}, {name: "Start Date Index")
+  db.products.createIndex({startMarketingDate: 1}, {name: "Start Date Index"})
   db.products.createIndex({startMarketingDate: 1,
     endMarketingDate: 1}, {name: "Marketing Start/End Date Index"})
   db.products.createIndex({productTypeName: 1}, {name: "Product Type Index"})
