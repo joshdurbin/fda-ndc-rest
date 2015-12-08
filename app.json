@@ -9,8 +9,8 @@
     "rxmongo"
   ],
   "addons": [
-    'mongolab:sandbox'
-    'heroku-redis:hobby-dev'
+    "mongolab:sandbox"
+    "heroku-redis:hobby-dev"
   ],
   "env": {
     "BUILDPACK_URL": "https://github.com/heroku/heroku-buildpack-gradle",
