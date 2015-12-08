@@ -1,29 +1,30 @@
-package io.durbs.ndc.command.api
+package io.durbs.ndc.command.api.product
 
 import com.netflix.hystrix.HystrixCommandGroupKey
 import com.netflix.hystrix.HystrixObservableCommand
 import groovy.transform.CompileStatic
-import io.durbs.ndc.domain.product.Product
 import io.durbs.ndc.command.BaseAPIRequestParameters
+import io.durbs.ndc.domain.product.Product
 import io.durbs.ndc.service.ProductService
-import org.apache.commons.lang.math.NumberUtils
 import org.bson.conversions.Bson
 import ratpack.handling.Context
 import rx.Observable
 
 import static com.mongodb.client.model.Filters.gte
+import static com.mongodb.client.model.Filters.lte
+import static com.mongodb.client.model.Filters.or
 
 @CompileStatic
-class GetRandomProduct extends HystrixObservableCommand<Product> {
+class GetInactiveProducts extends HystrixObservableCommand<Product> {
 
   final ProductService productService
-  final GetRandomProductRequestParameters requestParameters
+  final GetInactiveProductsRequestParameters requestParameters
 
-  GetRandomProduct(Context context) {
-    super(HystrixCommandGroupKey.Factory.asKey('GetRandomProduct'))
+  GetInactiveProducts(Context context) {
+    super(HystrixCommandGroupKey.Factory.asKey('GetInactiveProducts'))
 
     this.productService = context.get(ProductService)
-    this.requestParameters = new GetRandomProductRequestParameters(context)
+    this.requestParameters = new GetInactiveProductsRequestParameters(context)
   }
 
   @Override
@@ -36,22 +37,16 @@ class GetRandomProduct extends HystrixObservableCommand<Product> {
       requestParameters.getOffSet())
   }
 
-  static class GetRandomProductRequestParameters extends BaseAPIRequestParameters {
+  static class GetInactiveProductsRequestParameters extends BaseAPIRequestParameters {
 
-    GetRandomProductRequestParameters(Context context) {
+    GetInactiveProductsRequestParameters(Context context) {
       super(context)
     }
 
     Bson getQueryFilter() {
 
-      gte('randomKey', Math.random())
+      or(gte('startMarketingDate', new Date()), lte('endMarketingDate', new Date()))
     }
-
-    Integer getPageSize() {
-
-      NumberUtils.INTEGER_ONE
-    }
-
   }
 
 }

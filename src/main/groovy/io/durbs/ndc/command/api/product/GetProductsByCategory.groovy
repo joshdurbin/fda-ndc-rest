@@ -1,4 +1,4 @@
-package io.durbs.ndc.command.api
+package io.durbs.ndc.command.api.product
 
 import com.netflix.hystrix.HystrixCommandGroupKey
 import com.netflix.hystrix.HystrixObservableCommand
@@ -10,13 +10,13 @@ import ratpack.handling.Context
 import rx.Observable
 
 @CompileStatic
-class GetAllProducts extends HystrixObservableCommand<Product> {
+class GetProductsByCategory extends HystrixObservableCommand<Product> {
 
   final ProductService productService
   final BaseAPIRequestParameters requestParameters
 
-  GetAllProducts(Context context) {
-    super(HystrixCommandGroupKey.Factory.asKey('GetAllProducts'))
+  GetProductsByCategory(Context context) {
+    super(HystrixCommandGroupKey.Factory.asKey('GetProductsByCategory'))
 
     this.productService = context.get(ProductService)
     this.requestParameters = new BaseAPIRequestParameters(context)

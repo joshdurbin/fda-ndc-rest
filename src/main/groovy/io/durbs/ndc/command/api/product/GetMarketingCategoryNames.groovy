@@ -1,4 +1,4 @@
-package io.durbs.ndc.command.api
+package io.durbs.ndc.command.api.product
 
 import com.netflix.hystrix.HystrixCommandGroupKey
 import com.netflix.hystrix.HystrixObservableCommand

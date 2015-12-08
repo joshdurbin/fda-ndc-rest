@@ -1,4 +1,4 @@
-package io.durbs.ndc.command.api
+package io.durbs.ndc.command.api.product
 
 import com.netflix.hystrix.HystrixCommandGroupKey
 import com.netflix.hystrix.HystrixObservableCommand
@@ -6,23 +6,24 @@ import groovy.transform.CompileStatic
 import io.durbs.ndc.domain.product.Product
 import io.durbs.ndc.command.BaseAPIRequestParameters
 import io.durbs.ndc.service.ProductService
+import org.apache.commons.lang.math.NumberUtils
 import org.bson.conversions.Bson
 import ratpack.handling.Context
 import rx.Observable
 
-import static com.mongodb.client.model.Filters.text
+import static com.mongodb.client.model.Filters.gte
 
 @CompileStatic
-class SearchForProductsByTerm extends HystrixObservableCommand<Product> {
+class GetRandomProduct extends HystrixObservableCommand<Product> {
 
   final ProductService productService
-  final SearchForProductsByTermRequestParameters requestParameters
+  final GetRandomProductRequestParameters requestParameters
 
-  SearchForProductsByTerm(Context context) {
-    super(HystrixCommandGroupKey.Factory.asKey('SearchForProductsByTerm'))
+  GetRandomProduct(Context context) {
+    super(HystrixCommandGroupKey.Factory.asKey('GetRandomProduct'))
 
     this.productService = context.get(ProductService)
-    this.requestParameters = new SearchForProductsByTermRequestParameters(context)
+    this.requestParameters = new GetRandomProductRequestParameters(context)
   }
 
   @Override
@@ -35,17 +36,22 @@ class SearchForProductsByTerm extends HystrixObservableCommand<Product> {
       requestParameters.getOffSet())
   }
 
-  static class SearchForProductsByTermRequestParameters extends BaseAPIRequestParameters {
+  static class GetRandomProductRequestParameters extends BaseAPIRequestParameters {
 
-    static final String SEARCH_QUERY_PARAM_KEY = 'q'
-    static final String DEFAULT_SEARCH_TERM = ''
-
-    SearchForProductsByTermRequestParameters(Context context) {
+    GetRandomProductRequestParameters(Context context) {
       super(context)
     }
 
     Bson getQueryFilter() {
-      text(context.request.queryParams.get(SEARCH_QUERY_PARAM_KEY, DEFAULT_SEARCH_TERM))
+
+      gte('randomKey', Math.random())
     }
+
+    Integer getPageSize() {
+
+      NumberUtils.INTEGER_ONE
+    }
+
   }
+
 }

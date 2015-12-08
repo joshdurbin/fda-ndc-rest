@@ -1,14 +1,14 @@
 package io.durbs.ndc.chain
 
 import com.google.inject.Singleton
-import io.durbs.ndc.command.api.GetActiveProducts
-import io.durbs.ndc.command.api.GetAllProducts
-import io.durbs.ndc.command.api.GetInactiveProducts
-import io.durbs.ndc.command.api.GetMarketingCategoryNames
-import io.durbs.ndc.command.api.GetProductTypeNames
-import io.durbs.ndc.command.api.GetProductsByNDCCode
-import io.durbs.ndc.command.api.GetRandomProduct
-import io.durbs.ndc.command.api.SearchForProductsByTerm
+import io.durbs.ndc.command.api.product.GetActiveProducts
+import io.durbs.ndc.command.api.product.GetAllProducts
+import io.durbs.ndc.command.api.product.GetInactiveProducts
+import io.durbs.ndc.command.api.product.GetMarketingCategoryNames
+import io.durbs.ndc.command.api.product.GetProductTypeNames
+import io.durbs.ndc.command.api.product.GetProductsByNDCCode
+import io.durbs.ndc.command.api.product.GetRandomProduct
+import io.durbs.ndc.command.api.product.SearchForProductsByTerm
 import io.durbs.ndc.domain.product.Product
 import ratpack.groovy.handling.GroovyChainAction
 import ratpack.jackson.Jackson
