@@ -3,6 +3,7 @@ package io.durbs.ndc.command
 import groovy.transform.CompileStatic
 import io.durbs.ndc.config.RESTAPIConfig
 import io.durbs.ndc.domain.APIAuthResult
+import org.apache.commons.lang.math.NumberUtils
 import org.bson.BsonDocument
 import org.bson.codecs.configuration.CodecRegistry
 import org.bson.conversions.Bson
@@ -61,7 +62,7 @@ class BaseAPIRequestParameters {
 
     final Integer limit
 
-    if (suppliedPageSize > restapiConfig.maxResultsPageSize) {
+    if (suppliedPageSize > restapiConfig.maxResultsPageSize || suppliedPageSize == NumberUtils.INTEGER_ZERO) {
       limit = restapiConfig.maxResultsPageSize
     } else {
       limit = suppliedPageSize
