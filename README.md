@@ -46,3 +46,22 @@ Data load procedures:
 ```
 
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/joshdurbin/fda-ndc-rest)  
+
+Slow query analysis:
+
+Find active and inactive products queries are first to fall victim to semaphore limits and timeouts, causeing excessive breaker failures.
+
+The following is the query for GetActiveProducts and an explanation from Mongo regarding which indexes and collections is relies on / queries.
+
+```javascript
+db.products.find(
+    { $and: [
+        { startMarketingDate: { $gte: ISODate('2010-11-01T00:00:00Z') } },
+        { $or: [
+            { endMarketingDate: { $exists: false } },
+            { endMarketingDate: { $eq: ISODate('2010-11-01T00:00:00Z') } }
+        ]}
+    ]}
+).explain()
+```
+
