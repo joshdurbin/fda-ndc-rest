@@ -45,7 +45,9 @@ class GetInactiveProducts extends HystrixObservableCommand<Product> {
 
     Bson getQueryFilter() {
 
-      or(gte('startMarketingDate', new Date()), lte('endMarketingDate', new Date()))
+      final Date now = new Date()
+
+      or(gte('startMarketingDate', now), lte('endMarketingDate', now))
     }
   }
 
