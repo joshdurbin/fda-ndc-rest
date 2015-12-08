@@ -9,7 +9,7 @@
     "rxmongo"
   ],
   "addons": [
-    "mongolab:sandbox"
+    "mongolab:sandbox",
     "heroku-redis:hobby-dev"
   ],
   "env": {
