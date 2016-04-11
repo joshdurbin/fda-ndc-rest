@@ -14,9 +14,6 @@ class RESTAPIConfig {
   Integer defaultFirstPage
   String teaserProductProperties
   String sortProperties
-  Integer defaultRateLimitCeiling
-  Integer defaultRateLimitRemaining
-  Integer defaultRateLimitNextWindow
 
   List<String> getTeaserProductPropertiesAsList() {
 

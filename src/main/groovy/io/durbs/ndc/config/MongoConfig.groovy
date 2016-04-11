@@ -8,5 +8,6 @@ import groovy.transform.Immutable
 class MongoConfig {
 
   String db
+  String collection
   String uri
 }

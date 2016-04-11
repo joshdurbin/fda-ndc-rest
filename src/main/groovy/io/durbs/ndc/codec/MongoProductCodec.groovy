@@ -1,4 +1,4 @@
-package io.durbs.ndc.codec.mongo
+package io.durbs.ndc.codec
 
 import io.durbs.ndc.domain.product.Packaging
 import io.durbs.ndc.domain.product.PharmacologicalClassCategory

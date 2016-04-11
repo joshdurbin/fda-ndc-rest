@@ -15,14 +15,14 @@ Data load procedures:
 7. Establish indexes on collection
 
   ```javascript
-  db.products.createIndex({productNDC: 1}, {name: "NDC Code Index"})
-  db.products.createIndex({labelerName: 1}, {name: "Labeler Name Index"})
-  db.products.createIndex({startMarketingDate: 1}, {name: "Start Date Index"})
+  db.products.createIndex({productNDC: 1}, {name: "ndc-code"})
+  db.products.createIndex({labelerName: 1}, {name: "labeler"})
+  db.products.createIndex({startMarketingDate: 1}, {name: "start-date"})
   db.products.createIndex({startMarketingDate: 1,
-    endMarketingDate: 1}, {name: "Marketing Start/End Date Index"})
-  db.products.createIndex({productTypeName: 1}, {name: "Product Type Index"})
-  db.products.createIndex({marketingCategoryName: 1}, {name: "Marketing Category Name Index"})
-  db.products.createIndex({randomKey: 1}, {name: "Random double created for random production selection"})
+    endMarketingDate: 1}, {name: "start-end-date"})
+  db.products.createIndex({productTypeName: 1}, {name: "product-type"})
+  db.products.createIndex({marketingCategoryName: 1}, {name: "marketing-cat-name"})
+  db.products.createIndex({randomKey: 1}, {name: "random-key"})
 ```
 
 8. Establish text indexes on collection

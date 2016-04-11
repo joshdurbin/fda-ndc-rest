@@ -4,8 +4,9 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 
 import io.durbs.ndc.NDCRestModule
+import io.durbs.ndc.chain.AuthorizationTokenAPIActionChain
 import io.durbs.ndc.chain.ProductAPIActionChain
-import io.durbs.ndc.chain.ProductAPIAuthActionChain
+import io.durbs.ndc.chain.ProductAPIAuthorizationActionChain
 
 import io.durbs.ndc.config.MongoConfig
 import io.durbs.ndc.config.RESTAPIConfig
@@ -14,13 +15,13 @@ import ratpack.config.ConfigData
 import ratpack.hystrix.HystrixMetricsEventStreamHandler
 import ratpack.hystrix.HystrixModule
 import ratpack.rx.RxRatpack
-import ratpack.server.Service
-import ratpack.server.StartEvent
 
 import static ratpack.groovy.Groovy.ratpack
 
 ratpack {
   bindings {
+
+    RxRatpack.initialize()
 
     ConfigData configData = ConfigData.of { c ->
       c.yaml("$serverConfig.baseDir.file/application.yaml")
@@ -40,26 +41,20 @@ ratpack {
 
     module NDCRestModule
     module new HystrixModule().sse()
-
-    bindInstance Service, new Service() {
-
-      @Override
-      void onStart(StartEvent event) throws Exception {
-
-        RxRatpack.initialize()
-      }
-    }
   }
 
   handlers {
 
-    get('loaderio-69848b6992185269cd57a7fc9d760715.txt') {
-      render('loaderio-69848b6992185269cd57a7fc9d760715')
+    // CHAINS FOR CREATING AND RENEWING TOKENS
+    prefix('api/v0/authorization') {
+
+      all chain(registry.get(AuthorizationTokenAPIActionChain))
     }
 
-    all chain(registry.get(ProductAPIAuthActionChain))
-
+    // CHAINS FOR PRODUCT DATA ACCESS
     prefix('api/v0/product') {
+
+      all chain(registry.get(ProductAPIAuthorizationActionChain))
       all chain(registry.get(ProductAPIActionChain))
     }
 

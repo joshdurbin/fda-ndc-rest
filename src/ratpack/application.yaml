@@ -3,6 +3,7 @@ redis:
   cacheTTLInSeconds: 3600
 mongo:
   db: fda-ndc-rest
+  collection: products
   uri: mongodb://localhost/fda-ndc-rest
 api:
   defaultResultsPageSize: 20

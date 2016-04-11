@@ -2,7 +2,7 @@ package io.durbs.ndc.command
 
 import groovy.transform.CompileStatic
 import io.durbs.ndc.config.RESTAPIConfig
-import io.durbs.ndc.domain.APIAuthResult
+import io.durbs.ndc.domain.auth.APIAuthResult
 import org.apache.commons.lang.math.NumberUtils
 import org.bson.BsonDocument
 import org.bson.codecs.configuration.CodecRegistry
