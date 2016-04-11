@@ -132,14 +132,6 @@ class NDCRestModule extends AbstractModule {
           // OPEN A BLOCKING CONNECTION
           mongoClient = new MongoClient(new MongoClientURI(mongoConfig.uri))
 
-          if (!mongoClient.listDatabaseNames().contains(mongoConfig.db)) {
-
-            log.info("Creating Mongo DB '${mongoConfig.db}'...")
-
-            // GET IMPLICITLY CREATES THE DB
-            mongoClient.getDatabase(mongoConfig.db)
-          }
-
           if (!mongoClient.getDatabase(mongoConfig.db).listCollectionNames().contains(mongoConfig.collection)) {
 
             log.info("Creating Mongo collection '${mongoConfig.collection}' in DB '${mongoConfig.db}'...")
