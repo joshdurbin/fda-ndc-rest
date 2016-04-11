@@ -56,8 +56,8 @@ class GetActiveProducts extends HystrixObservableCommand<Product> {
 
     Bson getSortCriteria() {
 
-      if (context.request.queryParams.containsKey(BaseAPIRequestParameters.SORT_ASCENDING_QUERY_PARAM_KEY)
-        || context.request.queryParams.containsKey(BaseAPIRequestParameters.SORT_DESCENDING_QUERY_PARAM_KEY)) {
+      if (context.request.queryParams.containsKey(SORT_ASCENDING_QUERY_PARAM_KEY)
+        || context.request.queryParams.containsKey(SORT_DESCENDING_QUERY_PARAM_KEY)) {
 
         super.sortCriteria
       } else {
