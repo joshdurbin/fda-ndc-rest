@@ -22,6 +22,9 @@ class GetProductsByNDCCode extends HystrixObservableCommand<Product> {
   final GetProductsByNDCCodeRequestParameters requestParameters
   final RedisConfig redisConfig
 
+  static final String FULL_PRODUCTS_CACHE_HASH_KEY = 'full'
+  static final String PARTIAL_PRODUCTS_CACHE_HASH_KEY = 'partial'
+
   GetProductsByNDCCode(Context context) {
     super(HystrixCommandGroupKey.Factory.asKey('GetProductsByNDCCode'))
 
@@ -34,7 +37,7 @@ class GetProductsByNDCCode extends HystrixObservableCommand<Product> {
   @Override
   protected Observable<Product> construct() {
 
-    cacheService.productsCache.get(requestParameters.productNDC).bindExec()
+    cacheService.productsCache.hget(GET_HASH_CACHE_KEY(requestParameters.authenticated), requestParameters.productNDC).bindExec()
       .switchIfEmpty(
         productService.getProducts(requestParameters.queryFilter,
         requestParameters.sortCriteria,
@@ -42,9 +45,14 @@ class GetProductsByNDCCode extends HystrixObservableCommand<Product> {
         requestParameters.pageSize,
         requestParameters.getOffSet())
           .doOnNext { Product product ->
-            cacheService.productsCache.set(product.productNDC, product).bindExec().subscribe()
+            cacheService.productsCache.hset(GET_HASH_CACHE_KEY(requestParameters.authenticated), product.productNDC, product).bindExec().subscribe()
           }
     )
+  }
+
+  static final String GET_HASH_CACHE_KEY(final Boolean isAuthenticated) {
+
+    isAuthenticated ? FULL_PRODUCTS_CACHE_HASH_KEY : PARTIAL_PRODUCTS_CACHE_HASH_KEY
   }
 
   static class GetProductsByNDCCodeRequestParameters extends BaseAPIRequestParameters {
