@@ -13,7 +13,6 @@ import io.durbs.ndc.domain.product.Packaging
 import io.durbs.ndc.domain.product.PharmacologicalClassCategory
 import io.durbs.ndc.domain.product.Product
 import io.durbs.ndc.domain.product.Substance
-import javafx.scene.paint.Stop
 import org.apache.commons.lang.StringUtils
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
