@@ -10,16 +10,16 @@ import ratpack.handling.Context
 import rx.Observable
 
 @CompileStatic
-class GetProductTypeNames extends HystrixObservableCommand<String> {
+class GetLabelerNames extends HystrixObservableCommand<String> {
 
-  private static final String DISTINCT_PROPERTY_KEY = 'productTypeName'
-  private static final String CACHE_KEY = 'productTypes'
+  private static final String DISTINCT_PROPERTY_KEY = 'labelerName'
+  private static final String CACHE_KEY = 'labelerNames'
 
   final CacheService cacheService
   final ProductService productService
 
-  public GetProductTypeNames(Context context) {
-    super(HystrixCommandGroupKey.Factory.asKey('GetProductTypeNames'))
+  GetLabelerNames(Context context) {
+    super(HystrixCommandGroupKey.Factory.asKey('GetLabelerNames'))
 
     this.productService = context.get(ProductService)
     this.cacheService = context.get(CacheService)
@@ -30,10 +30,9 @@ class GetProductTypeNames extends HystrixObservableCommand<String> {
 
     cacheService.stringsCache.smembers(CACHE_KEY).bindExec()
       .switchIfEmpty(
-      productService.getDistinctList(DISTINCT_PROPERTY_KEY, new Document())
-        .doOnNext { String categoryName ->
-          cacheService.stringsCache.sadd(CACHE_KEY, categoryName).subscribe() }
-    )
+        productService.getDistinctList(DISTINCT_PROPERTY_KEY, new Document())
+        .doOnNext { String labelerName ->
+          cacheService.stringsCache.sadd(CACHE_KEY, labelerName).subscribe() }
+      )
   }
-
 }

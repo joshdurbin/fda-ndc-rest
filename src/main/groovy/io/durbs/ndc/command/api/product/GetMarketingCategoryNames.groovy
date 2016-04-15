@@ -5,6 +5,7 @@ import com.netflix.hystrix.HystrixObservableCommand
 import groovy.transform.CompileStatic
 import io.durbs.ndc.service.CacheService
 import io.durbs.ndc.service.ProductService
+import org.bson.Document
 import ratpack.handling.Context
 import rx.Observable
 
@@ -29,7 +30,7 @@ class GetMarketingCategoryNames extends HystrixObservableCommand<String> {
 
     cacheService.stringsCache.smembers(CACHE_KEY).bindExec()
       .switchIfEmpty(
-        productService.getDistinctList(DISTINCT_PROPERTY_KEY)
+        productService.getDistinctList(DISTINCT_PROPERTY_KEY, new Document())
         .doOnNext { String categoryName ->
           cacheService.stringsCache.sadd(CACHE_KEY, categoryName).subscribe() }
       )

@@ -22,8 +22,8 @@ class GetProductsByNDCCode extends HystrixObservableCommand<Product> {
   final GetProductsByNDCCodeRequestParameters requestParameters
   final RedisConfig redisConfig
 
-  static final String FULL_PRODUCTS_CACHE_HASH_KEY = 'full'
-  static final String PARTIAL_PRODUCTS_CACHE_HASH_KEY = 'partial'
+  static final String FULL_PRODUCTS_CACHE_HASH_KEY = 'full-product-cache'
+  static final String PARTIAL_PRODUCTS_CACHE_HASH_KEY = 'partial-product-cache'
 
   GetProductsByNDCCode(Context context) {
     super(HystrixCommandGroupKey.Factory.asKey('GetProductsByNDCCode'))

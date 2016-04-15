@@ -34,6 +34,7 @@ import io.durbs.ndc.domain.auth.APIAuthRecord
 import io.durbs.ndc.domain.product.Product
 import io.durbs.ndc.service.AuthenticationService
 import io.durbs.ndc.service.CacheService
+import io.durbs.ndc.service.NDCDataImporterService
 import io.durbs.ndc.service.ProductService
 import org.bson.Document
 import org.bson.codecs.configuration.CodecRegistries
@@ -60,6 +61,7 @@ class NDCRestModule extends AbstractModule {
     // services
     bind(AuthenticationService)
     bind(CacheService)
+    bind(NDCDataImporterService)
     bind(ProductService)
   }
 

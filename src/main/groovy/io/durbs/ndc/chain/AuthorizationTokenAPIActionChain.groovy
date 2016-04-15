@@ -23,10 +23,5 @@ class AuthorizationTokenAPIActionChain extends GroovyChainAction {
         render "Yeah, ok. I made it: '{ok}'"
       }
     }
-
-    delete {
-
-      authorizationService
-    }
   }
 }

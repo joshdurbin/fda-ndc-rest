@@ -22,6 +22,9 @@ dependencies {
   compile ratpack.dependency('hystrix')
   compile ratpack.dependency('rx')
 
+  compile 'com.univocity:univocity-parsers:2.0.2'
+  compile 'org.jsoup:jsoup:1.8.1'
+
   compile 'biz.paluch.redis:lettuce:4.1.1.Final'
   compile 'com.esotericsoftware:kryo:3.0.3'
 

@@ -7,10 +7,11 @@ import io.durbs.ndc.NDCRestModule
 import io.durbs.ndc.chain.AuthorizationTokenAPIActionChain
 import io.durbs.ndc.chain.ProductAPIActionChain
 import io.durbs.ndc.chain.ProductAPIAuthorizationActionChain
-
+import io.durbs.ndc.config.ImporterConfig
 import io.durbs.ndc.config.MongoConfig
 import io.durbs.ndc.config.RESTAPIConfig
 import io.durbs.ndc.config.RedisConfig
+import io.durbs.ndc.service.NDCDataImporterService
 import ratpack.config.ConfigData
 import ratpack.hystrix.HystrixMetricsEventStreamHandler
 import ratpack.hystrix.HystrixModule
@@ -29,6 +30,7 @@ ratpack {
       c.sysProps()
     }
 
+    bindInstance(ImporterConfig, configData.get('/importer', ImporterConfig))
     bindInstance(MongoConfig, configData.get('/mongo', MongoConfig))
     bindInstance(RESTAPIConfig, configData.get('/api', RESTAPIConfig))
     bindInstance(RedisConfig, configData.get('/redis', RedisConfig))
@@ -56,6 +58,11 @@ ratpack {
 
       all chain(registry.get(ProductAPIAuthorizationActionChain))
       all chain(registry.get(ProductAPIActionChain))
+    }
+
+    get('oOmsM6rHVhCJNWA5PVk1ar8eHr5fTwPyjuGnPzDeafnOxPYyvgAVhFBj2QLu8zYuXKqYSNepmKiOK53m7kClx50iHx6EGeZ3hGul5syjDcEOUE6nyBBjG9APF43gfQT8') { NDCDataImporterService importerService ->
+
+      importerService.dropAndReplaceProductDatabase()
     }
 
     get('hystrix.stream', new HystrixMetricsEventStreamHandler())

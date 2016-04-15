@@ -1,9 +1,12 @@
 package io.durbs.ndc.chain
 
 import com.google.inject.Singleton
+import groovy.util.logging.Slf4j
+import io.durbs.ndc.command.api.product.CreateProduct
 import io.durbs.ndc.command.api.product.GetActiveProducts
 import io.durbs.ndc.command.api.product.GetAllProducts
 import io.durbs.ndc.command.api.product.GetInactiveProducts
+import io.durbs.ndc.command.api.product.GetLabelerNames
 import io.durbs.ndc.command.api.product.GetMarketingCategoryNames
 import io.durbs.ndc.command.api.product.GetProductTypeNames
 import io.durbs.ndc.command.api.product.GetProductsByNDCCode
@@ -14,10 +17,24 @@ import ratpack.groovy.handling.GroovyChainAction
 import ratpack.jackson.Jackson
 
 @Singleton
+@Slf4j
 class ProductAPIActionChain extends GroovyChainAction {
 
   @Override
   void execute() throws Exception {
+
+//    post('create') {
+//
+//      new CreateProduct(context)
+//        .observe()
+//        .single()
+//        .subscribe { Product product ->
+//
+//        log.info("ID for created product is ${product.id}")
+//
+//        redirect("/api/v0/product/${product.productNDC}")
+//      }
+//    }
 
     get('random') {
 
@@ -39,6 +56,11 @@ class ProductAPIActionChain extends GroovyChainAction {
 
         render Jackson.json(products)
       }
+    }
+
+    get('status') {
+
+      redirect('status/active')
     }
 
     get('status/active') {
@@ -74,11 +96,6 @@ class ProductAPIActionChain extends GroovyChainAction {
       }
     }
 
-    get('types/:type') {
-
-      render "${pathTokens.get('type')}"
-    }
-
     get('marketingCategories') {
 
       new GetMarketingCategoryNames(context)
@@ -90,9 +107,15 @@ class ProductAPIActionChain extends GroovyChainAction {
       }
     }
 
-    get('marketingCategories/:category') {
+    get('labelerNames') {
 
-      render "${pathTokens.get('category')}"
+      new GetLabelerNames(context)
+        .observe()
+        .toList()
+        .subscribe { List<String> names ->
+
+        render Jackson.json(names)
+      }
     }
 
     get(':ndcCode') {

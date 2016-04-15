@@ -11,6 +11,7 @@ api:
   defaultFirstPage: 0
   teaserProductProperties: productNDC,proprietaryName,startMarketingDate,endMarketingDate,labelerName,substances
   sortProperties: startMarketingDate,productTypeName,marketingCategoryName,labelerName
-  defaultRateLimitCeiling:
-  defaultRateLimitRemaining:
-  defaultRateLimitNextWindow:
+importer:
+  ndcDirectoryPage: http://www.fda.gov/Drugs/InformationOnDrugs/ucm142438.htm
+  ndcDatabaseFileURL: http://www.accessdata.fda.gov/cder/ndc.zip
+  refreshCheckTimeInHours: 12
