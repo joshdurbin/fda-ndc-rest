@@ -14,4 +14,4 @@ api:
 importer:
   ndcDirectoryPage: http://www.fda.gov/Drugs/InformationOnDrugs/ucm142438.htm
   ndcDatabaseFileURL: http://www.accessdata.fda.gov/cder/ndc.zip
-  refreshCheckTimeInHours: 12
+  refreshCheckTimeInHours: 1

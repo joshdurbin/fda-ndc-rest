@@ -54,6 +54,15 @@ class ProductService {
       .bindExec()
   }
 
+  Observable<DeleteResult> removeProduct(final Bson queryFilter) {
+
+    mongoDatabase
+      .getCollection(mongoConfig.collection, Product)
+      .deleteOne(queryFilter)
+      .bindExec()
+  }
+
+  // temporary
   Observable<Long> replaceAllProducts(final List<Product> products) {
 
     mongoDatabase
@@ -65,8 +74,8 @@ class ProductService {
         .getCollection(mongoConfig.collection, Product)
         .insertMany(products)
     } as Func1)
-    .countLong()
-    .bindExec()
+      .countLong()
+      .bindExec()
   }
 
   Observable<String> getDistinctList(final String propertyToQuery,
@@ -79,6 +88,5 @@ class ProductService {
       .toObservable()
       .bindExec()
   }
-
 
 }

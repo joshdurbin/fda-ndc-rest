@@ -9,6 +9,7 @@ import io.durbs.ndc.command.api.product.GetInactiveProducts
 import io.durbs.ndc.command.api.product.GetLabelerNames
 import io.durbs.ndc.command.api.product.GetMarketingCategoryNames
 import io.durbs.ndc.command.api.product.GetProductTypeNames
+import io.durbs.ndc.command.api.product.GetProductsByID
 import io.durbs.ndc.command.api.product.GetProductsByNDCCode
 import io.durbs.ndc.command.api.product.GetRandomProduct
 import io.durbs.ndc.command.api.product.SearchForProductsByTerm
@@ -23,18 +24,18 @@ class ProductAPIActionChain extends GroovyChainAction {
   @Override
   void execute() throws Exception {
 
-//    post('create') {
-//
-//      new CreateProduct(context)
-//        .observe()
-//        .single()
-//        .subscribe { Product product ->
-//
-//        log.info("ID for created product is ${product.id}")
-//
-//        redirect("/api/v0/product/${product.productNDC}")
-//      }
-//    }
+    post('create') {
+
+      new CreateProduct(context)
+        .observe()
+        .single()
+        .subscribe { Product product ->
+
+        log.info("ID for created product is ${product.id}")
+
+        redirect("/api/v0/product/code/${product.productNDC}")
+      }
+    }
 
     get('random') {
 
@@ -50,6 +51,17 @@ class ProductAPIActionChain extends GroovyChainAction {
     get('search') {
 
       new SearchForProductsByTerm(context)
+        .observe()
+        .toList()
+        .subscribe { List<Product> products ->
+
+        render Jackson.json(products)
+      }
+    }
+
+    get('byNDCCode/:ndcCode') {
+
+      new GetProductsByNDCCode(context)
         .observe()
         .toList()
         .subscribe { List<Product> products ->
@@ -118,9 +130,9 @@ class ProductAPIActionChain extends GroovyChainAction {
       }
     }
 
-    get(':ndcCode') {
+    get(":id") {
 
-      new GetProductsByNDCCode(context)
+      new GetProductsByID(context)
         .observe()
         .single()
         .subscribe { Product product ->

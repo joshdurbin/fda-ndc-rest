@@ -1,4 +1,4 @@
-package io.durbs.ndc.service
+package io.durbs.ndc.service.importer
 
 import com.google.common.base.Stopwatch
 import com.google.common.io.ByteStreams
@@ -7,29 +7,32 @@ import com.google.inject.Singleton
 import com.univocity.parsers.common.record.Record
 import com.univocity.parsers.tsv.TsvParser
 import com.univocity.parsers.tsv.TsvParserSettings
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import io.durbs.ndc.config.ImporterConfig
 import io.durbs.ndc.domain.product.Packaging
 import io.durbs.ndc.domain.product.PharmacologicalClassCategory
 import io.durbs.ndc.domain.product.Product
 import io.durbs.ndc.domain.product.Substance
+import io.durbs.ndc.service.ProductService
 import org.apache.commons.lang.StringUtils
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
+import org.jsoup.nodes.Document as JsoupDocument
 import org.jsoup.select.Elements
 
+import java.security.SecureRandom
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
-//@CompileStatic
+@CompileStatic
 @Singleton
 @Slf4j
-class NDCDataImporterService {
+class DataImporterService {
 
-  static final Random RANDOM = new Random()
+  static final Random RANDOM = new SecureRandom()
   
   static final String PRODUCTS_TSV_FILENAME = 'product.txt'
   static final String PACKAGE_TSV_FILENAME = 'package.txt'
@@ -63,7 +66,7 @@ class NDCDataImporterService {
   // CHARACTER CONSTANTS
   static final String SEMICOLON = ";"
 
-  static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern('MM/dd/yyyy')
+  static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern('M/d/yyyy')
 
   @Inject
   ImporterConfig importerConfig
@@ -71,22 +74,28 @@ class NDCDataImporterService {
   @Inject
   ProductService productService
 
-  LocalDate getFDANDCMostRecentUpdateDate() {
+  public LocalDate getFDANDCMostRecentUpdateDate() {
 
+    final Stopwatch stopwatch = Stopwatch.createStarted()
     final String KEYWORD_SEARCH = 'Updated'
 
-    final Document ndcDirectoryPageDocument = Jsoup.connect(importerConfig.ndcDirectoryPage).get()
+    log.info("Acquiring stream to NDC web page at ${importerConfig.ndcDirectoryPage}...")
+
+    final JsoupDocument ndcDirectoryPageDocument = Jsoup.connect(importerConfig.ndcDirectoryPage).get()
+
+    log.info("Stream acquired and read fully in ${stopwatch.elapsed(TimeUnit.MILLISECONDS)}ms. Processing webpage, searching for date...")
+    stopwatch.reset()
+    stopwatch.start()
 
     final Elements panelBodyDiv = ndcDirectoryPageDocument.select('div.panel-body')
     final String firstUpdatedListItemText = panelBodyDiv.select("li:contains(${KEYWORD_SEARCH})").first().text()
     final String trimmedDateString = StringUtils.substringAfter(firstUpdatedListItemText, KEYWORD_SEARCH).trim()
 
-    LocalDate.parse(trimmedDateString, DATE_FORMATTER)
-  }
+    final LocalDate parsedDate = LocalDate.parse(trimmedDateString, DATE_FORMATTER)
 
-  public Boolean isProductDatabaseOutOfDate() {
+    log.info("Finished locating last updated date of ${parsedDate} in ${stopwatch.elapsed(TimeUnit.MILLISECONDS)}ms")
 
-    false
+    parsedDate
   }
 
   public List<Product> getFDANDCProducts() {
@@ -126,14 +135,12 @@ class NDCDataImporterService {
     products
   }
 
-  public void dropAndReplaceProductDatabase() {
-
-    productService.replaceAllProducts(getFDANDCProducts())
-      .subscribe()
-
-    true
-  }
-
+  /**
+   *
+   * @param productIDsToProducts
+   * @param productPackagingRecords
+   * @return
+   */
   private static List<Product> mapProductPackagingToProducts(final Map<String, Product> productIDsToProducts, final List<Record> productPackagingRecords) {
 
     productPackagingRecords.each {
@@ -163,6 +170,11 @@ class NDCDataImporterService {
     productIDsToProducts.values() as List<Product>
   }
 
+  /**
+   *
+   * @param records
+   * @return
+   */
   private static Map<String, Product> getProductsFromNDCPublishedDatabaseArchive(final List<Record> records) {
 
     final Map<String, Product> products = records.collectEntries { final Record record ->
@@ -173,11 +185,11 @@ class NDCDataImporterService {
 
         if (record.getString(SUBSTANCENAME)?.contains(SEMICOLON) && record.getString(ACTIVE_NUMERATOR_STRENGTH)?.contains(SEMICOLON) && record.getString(ACTIVE_INGRED_UNIT)?.contains(SEMICOLON)) {
 
-          final List<String> substancNames = record.getString(SUBSTANCENAME)?.split(SEMICOLON)
-          final List<String> substanceStrength = record.getString(ACTIVE_NUMERATOR_STRENGTH)?.split(SEMICOLON)
-          final List<String> substanceUnit = record.getString(ACTIVE_INGRED_UNIT)?.split(SEMICOLON)
+          final List<String> substancNames = record.getString(SUBSTANCENAME)?.split(SEMICOLON) as List<String>
+          final List<String> substanceStrength = record.getString(ACTIVE_NUMERATOR_STRENGTH)?.split(SEMICOLON) as List<String>
+          final List<String> substanceUnit = record.getString(ACTIVE_INGRED_UNIT)?.split(SEMICOLON) as List<String>
 
-          substancNames.eachWithIndex { String substanceName, int substanceNamesIndex ->
+          substancNames.eachWithIndex { String substanceName, Integer substanceNamesIndex ->
 
             substances.add(
               new Substance(
@@ -204,9 +216,9 @@ class NDCDataImporterService {
           productTypeName: record.getString(PRODUCTTYPENAME),
           proprietaryName: record.getString(PROPRIETARYNAME),
           proprietaryNameSuffix: record.getString(PROPRIETARYNAMESUFFIX),
-          nonProprietaryName: record.getString(NONPROPRIETARYNAME)?.split(SEMICOLON),
+          nonProprietaryName: record.getString(NONPROPRIETARYNAME)?.split(SEMICOLON) as List<String>,
           dosageFormName: record.getString(DOSAGEFORMNAME),
-          routeName: record.getString(ROUTENAME)?.split(SEMICOLON),
+          routeName: record.getString(ROUTENAME)?.split(SEMICOLON) as List<String>,
           startMarketingDate:  record.getString(STARTMARKETINGDATE) ? LocalDate.parse(record.getString(STARTMARKETINGDATE), DateTimeFormatter.BASIC_ISO_DATE) : null,
           endMarketingDate:  record.getString(ENDMARKETINGDATE) ? LocalDate.parse(record.getString(ENDMARKETINGDATE), DateTimeFormatter.BASIC_ISO_DATE) : null,
           marketingCategoryName:  record.getString(MARKETINGCATEGORYNAME),
@@ -236,7 +248,7 @@ class NDCDataImporterService {
   /**
    *
    * Takes an inputstream, converts it to a zipinputstream and checks for a filename match then passes that stream
-   *   to the TSV parser to product a list of records.
+   *   position to the TSV parser to product a list of records.
    *
    * @param inputStream
    * @param filename

@@ -30,6 +30,7 @@ class MongoProductCodec implements CollectibleCodec<Product> {
     final Document document = documentCodec.decode(reader, decoderContext)
 
     new Product(randomKey: document.getDouble('randomKey'),
+      id: document.getObjectId('_id') as String,
       productID: document.getString('productID'),
       productNDC: document.getString('productNDC'),
       productTypeName: document.getString('productTypeName'),
